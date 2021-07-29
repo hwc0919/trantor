@@ -63,15 +63,6 @@ TcpClient::TcpClient(EventLoop *loop,
       retry_(false),
       connect_(true)
 {
-    connector_->setNewConnectionCallback(
-        std::bind(&TcpClient::newConnection, this, _1));
-    connector_->setErrorCallback([this]() {
-        if (connectionErrorCallback_)
-        {
-            connectionErrorCallback_();
-        }
-    });
-    LOG_TRACE << "TcpClient::TcpClient[" << name_ << "] - connector ";
 }
 
 TcpClient::~TcpClient()
@@ -109,6 +100,27 @@ void TcpClient::connect()
     // TODO: check state
     LOG_TRACE << "TcpClient::connect[" << name_ << "] - connecting to "
               << connector_->serverAddress().toIpPort();
+    std::weak_ptr<Connector> weakPtr = connector_;
+    connector_->setNewConnectionCallback([weakPtr, this](int sockfd) {
+        auto connector = weakPtr.lock();
+        if (!connector)
+        {
+            return;
+        }
+        newConnection(sockfd);
+    });
+    connector_->setErrorCallback([weakPtr, this]() {
+        auto connector = weakPtr.lock();
+        if (!connector)
+        {
+            return;
+        }
+        if (connectionErrorCallback_)
+        {
+            connectionErrorCallback_();
+        }
+    });
+    LOG_TRACE << "TcpClient::TcpClient[" << name_ << "] - connector ";
     connect_ = true;
     connector_->start();
 }
