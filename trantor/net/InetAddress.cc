@@ -208,6 +208,9 @@ static void byteToChars(std::string::iterator &dst, unsigned char byte)
 
 static std::string iptos(unsigned inet_addr)
 {
+    // Convert to network byte order
+    inet_addr = htonl(inet_addr);
+
     // Initialize with a static buffer to force the constructor of string to get
     // fully inlined
     constexpr char stringInitBuffer[15]{};
