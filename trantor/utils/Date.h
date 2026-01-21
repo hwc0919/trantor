@@ -293,6 +293,8 @@ class TRANTOR_EXPORT Date
      * - yyyy-mm-dd
      * - yyyy-mm-dd HH:MM[:SS[.ffffff]]
      * - yyyy-mm-dd HH:MM[:SS[.ffffff]][Z|[+- ]HH:MM|[+- ]HHMM]
+     *
+     * @note Allows both space and 'T' as date-time separator
      */
     static Date fromISOString(const std::string &datetime);
 

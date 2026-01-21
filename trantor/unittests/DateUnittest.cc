@@ -115,15 +115,18 @@ TEST(Date, DatabaseStringTest)
 }
 TEST(Date, TimezoneTest)
 {
+    std::string dat0 = "2024-01-01";
     std::string str0 = "2024-01-01 04:00:00.123";
-    std::vector<std::string> strs{"2024-01-01 12:00:00.123 +08:00",
-                                  "2024-01-01 11:00:00.123+0700",
+    std::vector<std::string> strs{"2024-01-01 04:00:00.123Z",
+                                  "2024-01-01T04:00:00.123Z",
+                                  "2024-01-01 12:00:00.123 +08:00",
+                                  "2024-01-01T11:00:00.123+0700",
                                   "2024-01-01 10:00:00.123 0600",
-                                  "2024-01-01 03:00:00.123 -01:00",
+                                  "2024-01-01T03:00:00.123 -01:00",
                                   "2024-01-01 02:00:00.123-02:00",
-                                  "2024-01-01 01:00:00.123 -0300",
+                                  "2024-01-01T01:00:00.123 -0300",
                                   "2024-01-01 12:00:00.123 08",
-                                  "2024-01-01 02:00:00.123-02",
+                                  "2024-01-01T02:00:00.123-02",
                                   "2024-01-01 14:00:00.123+10"};
 
     auto date = trantor::Date::fromDbString(str0);
@@ -135,8 +138,13 @@ TEST(Date, TimezoneTest)
     }
 
     // time string without tz, should be parsed as local time
-    EXPECT_EQ(trantor::Date::fromDbString(str0).microSecondsSinceEpoch(),
+    auto dateLocal = trantor::Date::fromDbStringLocal(str0);
+    EXPECT_EQ(dateLocal.microSecondsSinceEpoch(),
               trantor::Date::fromISOString(str0).microSecondsSinceEpoch());
+
+    // only date part
+    EXPECT_EQ(dateLocal.secondsSinceEpoch() - 4 * 3600,
+              trantor::Date::fromISOString(dat0).secondsSinceEpoch());
 }
 
 int main(int argc, char **argv)

@@ -392,12 +392,33 @@ int parseTzOffset(std::string &tz, int tzSign)
     return tzSign * (tzHour * 3600 + tzMin * 60);
 }
 
+// Variant of splitString(), accepts multiple single-char delimiters
+static std::vector<std::string> splitString2(const std::string &s,
+                                             const std::string &delimiters,
+                                             bool acceptEmptyString = false)
+{
+    if (delimiters.empty())
+        return std::vector<std::string>{};
+    std::vector<std::string> v;
+    size_t last = 0;
+    size_t next = 0;
+    while ((next = s.find_first_of(delimiters, last)) != std::string::npos)
+    {
+        if (next > last || acceptEmptyString)
+            v.push_back(s.substr(last, next - last));
+        last = next + 1;
+    }
+    if (s.length() > last || acceptEmptyString)
+        v.push_back(s.substr(last));
+    return v;
+}
+
 Date Date::fromISOString(const std::string &datetime)
 {
     unsigned int year = {0}, month = {0}, day = {0}, hour = {0}, minute = {0},
                  second = {0}, microSecond = {0};
     int tzSign{0}, tzOffset{0};
-    std::vector<std::string> v = splitString(datetime, " ");
+    std::vector<std::string> v = splitString2(datetime, "T ");
     if (v.empty())
     {
         throw std::invalid_argument("Invalid date string: " + datetime);
