@@ -392,7 +392,7 @@ int parseTzOffset(std::string &tz, int tzSign)
     return tzSign * (tzHour * 3600 + tzMin * 60);
 }
 
-Date Date::parseDatetimeTz(const std::string &datetime)
+Date Date::fromISOString(const std::string &datetime)
 {
     unsigned int year = {0}, month = {0}, day = {0}, hour = {0}, minute = {0},
                  second = {0}, microSecond = {0};

@@ -129,14 +129,14 @@ TEST(Date, TimezoneTest)
     auto date = trantor::Date::fromDbString(str0);
     for (auto &s : strs)
     {
-        auto dateTz = trantor::Date::parseDatetimeTz(s);
+        auto dateTz = trantor::Date::fromISOString(s);
         EXPECT_EQ(date.microSecondsSinceEpoch(),
                   dateTz.microSecondsSinceEpoch());
     }
 
     // time string without tz, should be parsed as local time
     EXPECT_EQ(trantor::Date::fromDbString(str0).microSecondsSinceEpoch(),
-              trantor::Date::parseDatetimeTz(str0).microSecondsSinceEpoch());
+              trantor::Date::fromISOString(str0).microSecondsSinceEpoch());
 }
 
 int main(int argc, char **argv)

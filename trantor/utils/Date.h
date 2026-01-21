@@ -288,13 +288,13 @@ class TRANTOR_EXPORT Date
     static Date fromDbString(const std::string &datetime);
 
     /**
-     * @brief Parse a datetime string
-     * Could be following format:
+     * @brief Parse a datetime string in ISO-8601 format with some flexibility.
+     * Accepts the following formats:
      * - yyyy-mm-dd
      * - yyyy-mm-dd HH:MM[:SS[.ffffff]]
-     * - yyyy-mm-dd HH:MM[:SS[.ffffff]][ ][+-]08[[:]00]
+     * - yyyy-mm-dd HH:MM[:SS[.ffffff]][Z|[+- ]HH:MM|[+- ]HHMM]
      */
-    static Date parseDatetimeTz(const std::string &datetime);
+    static Date fromISOString(const std::string &datetime);
 
     /* clang-format off */
     /**
