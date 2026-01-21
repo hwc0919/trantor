@@ -362,14 +362,18 @@ Date Date::fromDbString(const std::string &datetime)
         static_cast<double>(timezoneOffset()));
 }
 
-int parseTzOffset(std::string &tz, int tzSign)
+static int parseTzOffset(std::string &tz, int tzSign)
 {
+    if (tz.empty())
+    {
+        return 0;
+    }
     if (tzSign == 0)
     {
-        if (tz[0] == '-')
+        if (tz[0] == '-' || tz[0] == '+')
         {
+            tzSign = tz[0] == '-' ? -1 : 1;
             tz = tz.substr(1);
-            tzSign = -1;
         }
         else
         {
@@ -383,11 +387,12 @@ int parseTzOffset(std::string &tz, int tzSign)
     }
 
     auto tzParts = splitString(tz, ":");
-    if (tzParts.size() == 1 && tz.size() == 4)
+    if (tzParts.size() == 1 && tz.size() >= 4)
     {
         tzParts = {tz.substr(0, 2), tz.substr(2)};  // 0800
     }
-    int tzHour = std::stoi(tzParts[0]);
+
+    int tzHour = tzParts.size() > 0 ? std::stoi(tzParts[0]) : 0;
     int tzMin = tzParts.size() > 1 ? std::stoi(tzParts[1]) : 0;
     return tzSign * (tzHour * 3600 + tzMin * 60);
 }
@@ -440,7 +445,7 @@ Date Date::fromISOString(const std::string &datetime)
         return trantor::Date{year, month, day};
     }
 
-    // check timezone without space seperated
+    // check timezone without space separated
     if (v.size() == 2)
     {
         auto pos = v[1].find('+');
